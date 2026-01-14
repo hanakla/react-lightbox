@@ -1,8 +1,19 @@
 # @hanakla/react-lightbox
 
+[![npm version](https://img.shields.io/npm/v/@hanakla/react-lightbox.svg?style=flat-square)](https://www.npmjs.com/package/@hanakla/react-lightbox)
+[![npm downloads](https://img.shields.io/npm/dm/@hanakla/react-lightbox.svg?style=flat-square)](https://www.npmjs.com/package/@hanakla/react-lightbox)
+[![bundle size](https://img.shields.io/bundlephobia/minzip/@hanakla/react-lightbox?style=flat-square)](https://bundlephobia.com/package/@hanakla/react-lightbox)
+[![license](https://img.shields.io/badge/license-WTFPL-green.svg?style=flat-square)](http://www.wtfpl.net/)
+
 A flexible headless lightbox component for React.
 
 Inspired by [react-image-viewer-hook](https://github.com/rkusa/react-image-viewer-hook), reimagined as a headless component library for maximum flexibility and customization.
+
+### Demo
+
+Try it out on CodeSandbox:
+
+[![Open in CodeSandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/p/devbox/qfw557?file=%2Fsrc%2FApp.tsx%3A13%2C3)
 
 ## Features
 
@@ -309,4 +320,4 @@ This library is inspired by [react-image-viewer-hook](https://github.com/rkusa/r
 
 ## License
 
-MIT
+WTFPL
