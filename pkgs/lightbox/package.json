@@ -1,14 +1,22 @@
 {
 	"name": "@hanakla/react-lightbox",
-	"version": "1.0.0",
+	"version": "1.0.2-beta.1",
 	"packageManager": "yarn@4.9.3",
+	"main": "./dist/index.js",
+	"module": "./dist/index.mjs",
+	"types": "./dist/index.d.ts",
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
 			"import": "./dist/index.mjs",
-			"require": "./dist/index.cjs"
+			"require": "./dist/index.js"
 		}
 	},
+	"files": [
+		"dist",
+		"README.md"
+	],
+	"sideEffects": false,
 	"scripts": {
 		"build": "tsup",
 		"dev": "tsup --watch",
