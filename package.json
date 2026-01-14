@@ -1,4 +1,15 @@
 {
-  "name": "react-lightbox",
-  "packageManager": "yarn@4.9.3"
+	"private": true,
+	"name": "@hanakla/react-lightbox-root",
+	"workspaces": [
+		"pkgs/*"
+	],
+	"scripts": {
+		"lint:fix": "biome check --write .",
+		"postinstall": "lefthook install"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.3.11",
+		"lefthook": "^2.0.15"
+	}
 }

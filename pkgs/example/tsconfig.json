@@ -1,0 +1,8 @@
+{
+	"compilerOptions": {
+		"jsx": "react-jsx",
+		"lib": ["ES2024"],
+		"downlevelIteration": true,
+		"moduleResolution": "node16"
+	}
+}
