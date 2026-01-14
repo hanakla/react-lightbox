@@ -1,6 +1,7 @@
 {
 	"name": "@hanakla/react-lightbox",
-	"version": "1.0.2",
+	"version": "1.0.3",
+	"license": "MIT",
 	"packageManager": "yarn@4.9.3",
 	"main": "./dist/index.js",
 	"module": "./dist/index.mjs",
@@ -14,7 +15,8 @@
 	},
 	"files": [
 		"dist",
-		"README.md"
+		"README.md",
+		"LICENSE"
 	],
 	"sideEffects": false,
 	"scripts": {
