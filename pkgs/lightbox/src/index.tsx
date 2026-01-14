@@ -40,8 +40,10 @@ type LightboxContext<T> = {
 };
 
 type LightboxDragContext = {
-	offset: number;
-	setOffset: Dispatch<SetStateAction<number>>;
+	offset: { x: number; y: number };
+	setOffset: Dispatch<SetStateAction<{ x: number; y: number }>>;
+	enableSwipe: boolean;
+	setEnableSwipe: Dispatch<SetStateAction<boolean>>;
 };
 
 const LightboxContext = createContext<LightboxContext<any> | null>(null);
@@ -222,14 +224,21 @@ export const Lightbox = {
 			const { items, currentIndex } =
 				useContextStrict<LightboxContext<any>>(LightboxContext);
 
-			const [offsetX, setOffsetX] = useState(0);
+			const [enableSwipe, setEnableSwipe] = useState(true);
+			const [offset, setOffsetX] = useState<{ x: number; y: number }>({
+				x: 0,
+				y: 0,
+			});
 
 			const dragContext = useMemo(
-				() => ({
-					offset: offsetX,
-					setOffset: setOffsetX,
-				}),
-				[offsetX],
+				() =>
+					({
+						offset,
+						setOffset: setOffsetX,
+						enableSwipe,
+						setEnableSwipe,
+					}) satisfies LightboxDragContext,
+				[offset, enableSwipe],
 			);
 
 			if (currentIndex == null) return null;
@@ -280,8 +289,14 @@ export const Lightbox = {
 			}: ComponentProps<"div"> & { $index: number },
 			ref: ForwardedRef<HTMLDivElement>,
 		) {
-			const { currentIndex, rootRef, items, onLoadNext, setCurrentIndex } =
-				useContextStrict<LightboxContext<any>>(LightboxContext);
+			const {
+				currentIndex,
+				rootRef,
+				items,
+				onLoadNext,
+				setCurrentIndex,
+				close,
+			} = useContextStrict<LightboxContext<any>>(LightboxContext);
 
 			const dragContext = useContextStrict<LightboxDragContext | null>(
 				LightboxDragContext,
@@ -291,17 +306,53 @@ export const Lightbox = {
 
 			const bind = useDrag(
 				async ({
-					down,
 					active,
-					movement: [mx],
+					movement: [mx, my],
 					direction: [xDir],
 					initial: [ix],
 					cancel,
+					pinching,
+					axis,
 				}) => {
 					if (currentIndex == null) return;
+					if (pinching) return cancel();
+					if (!dragContext.enableSwipe) return;
+					if (!rootRef.current) return;
 
-					if (active) {
-						if (down && rootRef.current) {
+					if (axis === "y") {
+						if (!active) {
+							const threshold = 100;
+
+							if (my > threshold) {
+								close();
+							}
+
+							setOffset((prev) => ({ x: prev.x, y: 0 }));
+							return;
+						}
+
+						setOffset((prev) => ({ x: prev.x, y: Math.max(0, my) }));
+					} else {
+						if (!active) {
+							const threshold = 100;
+
+							if (Math.abs(mx) > threshold) {
+								const nextIndex = currentIndex + (xDir < 0 ? 1 : -1);
+
+								if (nextIndex >= items.length - 1) {
+									await onLoadNext();
+								}
+
+								setCurrentIndex(
+									Math.min(Math.max(nextIndex, 0), items.length - 1),
+								);
+							}
+
+							setOffset((prev) => ({ x: 0, y: prev.y }));
+							return;
+						}
+
+						if (rootRef.current) {
 							const width = rootRef.current.clientWidth;
 							const edgeThreshold = width * 0.35;
 
@@ -312,27 +363,11 @@ export const Lightbox = {
 							}
 						}
 
-						setOffset(mx);
-					} else {
-						const threshold = 100;
-
-						if (Math.abs(mx) > threshold) {
-							const nextIndex = currentIndex + (xDir < 0 ? 1 : -1);
-
-							if (nextIndex >= items.length - 1) {
-								await onLoadNext();
-							}
-
-							setCurrentIndex(
-								Math.min(Math.max(nextIndex, 0), items.length - 1),
-							);
-						}
-
-						setOffset(0);
+						setOffset((prev) => ({ x: mx, y: prev.y }));
 					}
 				},
 				{
-					axis: "x",
+					axis: "lock",
 					filterTaps: true,
 					pointer: { touch: true },
 				},
@@ -355,8 +390,10 @@ export const Lightbox = {
 						flex: "1",
 						touchAction: "none",
 						userSelect: "none",
-						transform: `translateX(calc(-${currentIndex * 100}% + ${offset}px))`,
-						transition: offset === 0 ? "transform 0.3s ease-out" : "none",
+						transform: `translateX(calc(-${currentIndex * 100}% + ${
+							offset.x
+						}px)) translateY(${offset.y}px)`,
+						transition: offset.x === 0 ? "transform 0.3s ease-out" : "none",
 					}}
 				>
 					{children}
@@ -390,52 +427,54 @@ export const Lightbox = {
 			},
 			ref: React.Ref<HTMLDivElement>,
 		) {
+			const { currentIndex } = useContextStrict(LightboxContext);
+			const dragContext = useContextStrict<LightboxDragContext | null>(
+				LightboxDragContext,
+			);
+
+			const imageRef = useConcatRef<HTMLDivElement>(ref);
 			const [{ scale, x, y }, setTransform] = useState({
 				scale: 1,
 				x: 0,
 				y: 0,
 			});
-			const [swipeOffsetY, setSwipeOffsetY] = useState(0);
-			const imageRef = useConcatRef<HTMLDivElement>(ref);
 
 			useGesture(
 				{
-					onDrag: ({
-						offset: [ox, oy],
-						down,
-						movement: [, my],
-						pinching,
-						cancel,
-						event,
-					}) => {
-						if (scale !== 1) {
-							event.stopPropagation();
-						}
-
-						if (pinching) return cancel();
-
+					onDrag: ({ offset: [ox, oy], active }) => {
 						if (scale > 1) {
-							// When zoomed, allow panning the image
-							setTransform({ scale, x: ox, y: oy });
-						} else {
-							// When not zoomed, allow vertical swipe to close
-							if (down) {
-								// Only allow downward swipe
-								setSwipeOffsetY(Math.max(0, my));
-							} else {
-								const threshold = 100;
-								if (my > threshold) {
-									// Swipe down threshold exceeded, close viewer
-									onRequestClose?.({} as React.MouseEvent);
-								}
-								setSwipeOffsetY(0);
-							}
+							// Disable close gesture when zoomed
+							dragContext.setEnableSwipe(!active);
+							setTransform(({ scale }) => ({ scale, x: ox, y: oy }));
 						}
 					},
-					onPinch: ({ offset: [s], event }) => {
+					onPinch: ({ offset: [s], active, origin, event }) => {
+						dragContext.setEnableSwipe(!active);
+
 						event.preventDefault();
+						event.stopPropagation();
 						const newScale = Math.max(1, Math.min(s, 4));
-						setTransform({ scale: newScale, x: 0, y: 0 });
+
+						if (newScale === 1) {
+							setTransform({ scale: 1, x: 0, y: 0 });
+						} else if (imageRef.current && origin) {
+							const rect = imageRef.current.getBoundingClientRect();
+
+							const centerX = rect.left + rect.width / 2;
+							const centerY = rect.top + rect.height / 2;
+
+							const offsetX = origin[0] - centerX;
+							const offsetY = origin[1] - centerY;
+
+							const scaleChange = newScale - scale;
+							const newX = x - (offsetX * scaleChange) / scale;
+							const newY = y - (offsetY * scaleChange) / scale;
+
+							setTransform({ scale: newScale, x: newX, y: newY });
+						} else {
+							setTransform({ scale: newScale, x: 0, y: 0 });
+						}
+
 						onZoomChange?.(newScale > 1);
 					},
 					onWheel: ({ event, ctrlKey }) => {
@@ -467,10 +506,31 @@ export const Lightbox = {
 			});
 
 			const handleDoubleClick = useEventCallback((e: React.MouseEvent) => {
-				console.log("hi");
 				e.stopPropagation();
-				setTransform({ scale: 1, x: 0, y: 0 });
-				onZoomChange?.(false);
+
+				if (scale === 1) {
+					const newScale = 2;
+
+					if (imageRef.current) {
+						const rect = imageRef.current.getBoundingClientRect();
+
+						const centerX = rect.left + rect.width / 2;
+						const centerY = rect.top + rect.height / 2;
+
+						const offsetX = e.clientX - centerX;
+						const offsetY = e.clientY - centerY;
+
+						const scaleChange = newScale - scale;
+						const newX = x - (offsetX * scaleChange) / scale;
+						const newY = y - (offsetY * scaleChange) / scale;
+
+						setTransform({ scale: newScale, x: newX, y: newY });
+						onZoomChange?.(true);
+					}
+				} else {
+					setTransform({ scale: 1, x: 0, y: 0 });
+					onZoomChange?.(false);
+				}
 			});
 
 			const handleKeyDown = useEventCallback((e: React.KeyboardEvent) => {
@@ -485,6 +545,12 @@ export const Lightbox = {
 				}
 			});
 
+			// Reset zoom when image changes
+			// biome-ignore lint/correctness/useExhaustiveDependencies: watch only
+			useEffect(() => {
+				setTransform({ scale: 1, x: 0, y: 0 });
+			}, [currentIndex]);
+
 			return (
 				// biome-ignore lint/a11y/noStaticElementInteractions: ok
 				<div
@@ -496,10 +562,7 @@ export const Lightbox = {
 					style={{
 						touchAction: "none",
 						cursor: scale > 1 ? "grab" : "default",
-						opacity: scale === 1 ? Math.max(0.5, 1 - swipeOffsetY / 300) : 1,
-						transform: `translate(${x}px, ${
-							y + (scale === 1 ? swipeOffsetY : 0)
-						}px) scale(${scale})`,
+						transform: `translate(${x}px, ${y}px) scale(${scale})`,
 						maxHeight: `calc(100vh)`,
 					}}
 				>
