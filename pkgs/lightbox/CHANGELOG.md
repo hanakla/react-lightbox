@@ -1,3 +1,7 @@
+## 1.0.4
+
+- Improve swipe behavior
+
 ## 1.0.1, 1.0.2
 
 - Fix publishing issues.

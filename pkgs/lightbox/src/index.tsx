@@ -292,6 +292,7 @@ export const Lightbox = {
 			const bind = useDrag(
 				async ({
 					down,
+					active,
 					movement: [mx],
 					direction: [xDir],
 					initial: [ix],
@@ -299,22 +300,22 @@ export const Lightbox = {
 				}) => {
 					if (currentIndex == null) return;
 
-					// Only allow swipe from left or right edge (20% of width)
-					if (down && rootRef.current) {
-						const width = rootRef.current.clientWidth;
-						const edgeThreshold = width * 0.35;
+					if (active) {
+						if (down && rootRef.current) {
+							const width = rootRef.current.clientWidth;
+							const edgeThreshold = width * 0.35;
 
-						// Check if drag started from edge area
-						if (ix > edgeThreshold && ix < width - edgeThreshold) {
-							cancel();
-							return;
+							// Cancel drag if not started from edges
+							if (ix > edgeThreshold && ix < width - edgeThreshold) {
+								cancel();
+								return;
+							}
 						}
-					}
 
-					if (down) {
 						setOffset(mx);
 					} else {
 						const threshold = 100;
+
 						if (Math.abs(mx) > threshold) {
 							const nextIndex = currentIndex + (xDir < 0 ? 1 : -1);
 
@@ -334,7 +335,6 @@ export const Lightbox = {
 					axis: "x",
 					filterTaps: true,
 					pointer: { touch: true },
-					// enabled: !isZoomed,
 				},
 			);
 
