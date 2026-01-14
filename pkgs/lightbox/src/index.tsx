@@ -1,5 +1,5 @@
-import useFocusTrap from "@pofo/focus-trap";
 import { useDrag, useGesture } from "@use-gesture/react";
+import { FocusTrap } from "focus-trap-react";
 import {
 	type ComponentProps,
 	cloneElement,
@@ -141,23 +141,20 @@ export const Lightbox = {
 				});
 			}, [rootRef.current]);
 
-			useFocusTrap(
-				ref as React.RefObject<HTMLDivElement>,
-				currentIndex != null,
-			);
-
 			return (
-				<div
-					ref={ref as React.Ref<HTMLDivElement>}
-					role="dialog"
-					tabIndex={-1}
-					aria-modal="true"
-					onClick={onClickBackdrop}
-					onKeyDown={onKeydown}
-					{...props}
-				>
-					{children}
-				</div>
+				<FocusTrap active={currentIndex != null}>
+					<div
+						ref={ref as React.Ref<HTMLDivElement>}
+						role="dialog"
+						tabIndex={-1}
+						aria-modal="true"
+						onClick={onClickBackdrop}
+						onKeyDown={onKeydown}
+						{...props}
+					>
+						{children}
+					</div>
+				</FocusTrap>
 			);
 		}),
 	),

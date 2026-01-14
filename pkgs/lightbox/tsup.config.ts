@@ -5,4 +5,8 @@ export default defineConfig({
 	format: ["cjs", "esm"],
 	dts: true,
 	outDir: "dist",
+	external: ["react", "react-dom", "focus-trap-react", "@use-gesture/react"],
+	splitting: false,
+	sourcemap: true,
+	clean: true,
 });

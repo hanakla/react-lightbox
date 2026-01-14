@@ -1,6 +1,6 @@
 {
 	"name": "@hanakla/react-lightbox",
-	"version": "1.0.2-beta.1",
+	"version": "1.0.2-beta.3",
 	"packageManager": "yarn@4.9.3",
 	"main": "./dist/index.js",
 	"module": "./dist/index.mjs",
@@ -33,7 +33,7 @@
 		"react-dom": "*"
 	},
 	"dependencies": {
-		"@pofo/focus-trap": "^1.0.0",
-		"@use-gesture/react": "^10.3.1"
+		"@use-gesture/react": "^10.3.1",
+		"focus-trap-react": "^11.0.6"
 	}
 }

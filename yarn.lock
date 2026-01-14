@@ -319,10 +319,10 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hanakla/react-lightbox@workspace:pkgs/lightbox"
   dependencies:
-    "@pofo/focus-trap": "npm:^1.0.0"
     "@types/react": "npm:^19.2.7"
     "@types/react-dom": "npm:^19.2.3"
     "@use-gesture/react": "npm:^10.3.1"
+    focus-trap-react: "npm:^11.0.6"
     tsup: "npm:8.5.1"
     typescript: "npm:5.9.3"
   peerDependencies:
@@ -430,15 +430,6 @@ __metadata:
   dependencies:
     semver: "npm:^7.3.5"
   checksum: 10c0/26e376d780f60ff16e874a0ac9bc3399186846baae0b6e1352286385ac134d900cc5dafaded77f38d77f86898fc923ae1cee9d7399f0275b1aa24878915d722b
-  languageName: node
-  linkType: hard
-
-"@pofo/focus-trap@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "@pofo/focus-trap@npm:1.0.0"
-  peerDependencies:
-    react: ^17.0.2
-  checksum: 10c0/f5229f1e8f31f2c3028145eabe0db786c6361488e944a6e583c249952361d11457d247b9e012ecbbe23cc28c2a5946041340f462615765c703db8ed9e95ed672
   languageName: node
   linkType: hard
 
@@ -1292,6 +1283,30 @@ __metadata:
     mlly: "npm:^1.7.4"
     rollup: "npm:^4.34.8"
   checksum: 10c0/61a3cbe32b6c29df495ef3aded78199fe9dbb52e2801c899fe76d9ca413d3c8c51f79986bac83f8b4b2094ebde883ddcfe47b68ce469806ba13ca6ed4e7cd362
+  languageName: node
+  linkType: hard
+
+"focus-trap-react@npm:^11.0.6":
+  version: 11.0.6
+  resolution: "focus-trap-react@npm:11.0.6"
+  dependencies:
+    focus-trap: "npm:^7.8.0"
+    tabbable: "npm:^6.4.0"
+  peerDependencies:
+    "@types/react": ^18.0.0 || ^19.0.0
+    "@types/react-dom": ^18.0.0 || ^19.0.0
+    react: ^18.0.0 || ^19.0.0
+    react-dom: ^18.0.0 || ^19.0.0
+  checksum: 10c0/b262b40421cb3db100f4650b1ed124199aafc92f91eeb7155a740bca6616957ec89a7a98160c78cd6a9728050d4478c9a7cf9ca3fca12d4cf36580d4043b71f4
+  languageName: node
+  linkType: hard
+
+"focus-trap@npm:^7.8.0":
+  version: 7.8.0
+  resolution: "focus-trap@npm:7.8.0"
+  dependencies:
+    tabbable: "npm:^6.4.0"
+  checksum: 10c0/b75f97c2896de569fc779f9b898b7c4a48b0605176b2a7a4b70a64bc2ae39a0b3c66fc7c8b2cd4e5d1e0a439b031e025a7cd1031d3a68ab652c0495bc14f070a
   languageName: node
   linkType: hard
 
@@ -2285,6 +2300,13 @@ __metadata:
     sucrase: bin/sucrase
     sucrase-node: bin/sucrase-node
   checksum: 10c0/6fa22329c261371feb9560630d961ad0d0b9c87dce21ea74557c5f3ffbe5c1ee970ea8bcce9962ae9c90c3c47165ffa7dd41865c7414f5d8ea7a40755d612c5c
+  languageName: node
+  linkType: hard
+
+"tabbable@npm:^6.4.0":
+  version: 6.4.0
+  resolution: "tabbable@npm:6.4.0"
+  checksum: 10c0/d931427f4a96b801fd8801ba296a702119e06f70ad262fed8abc5271225c9f1ca51b89fdec4fb2f22e1d35acb3d2881db0a17cedc758272e9ecb540d00299d76
   languageName: node
   linkType: hard
 
