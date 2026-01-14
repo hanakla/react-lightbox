@@ -211,11 +211,11 @@ export const Lightbox = {
 			{
 				children,
 				$renderItem,
-				$direction = "horizontal",
+				// $direction = "horizontal",
 				...props
 			}: ComponentProps<"div"> & {
 				$renderItem: (item: unknown, index: number) => React.ReactElement;
-				$direction?: "horizontal" | "vertical";
+				// $direction?: "horizontal" | "vertical";
 			},
 			ref: ForwardedRef<HTMLDivElement>,
 		) {
