@@ -28,14 +28,17 @@ function App() {
 
 	const lb = useLightbox<ItemType>({
 		onLoadNext: () => {
-			setImages(
-				new Set([
-					...images,
-					"https://images.pexels.com/photos/35204301/pexels-photo-35204301.jpeg",
-					"https://images.pexels.com/photos/9493870/pexels-photo-9493870.jpeg",
-					"https://images.pexels.com/photos/3776939/pexels-photo-3776939.jpeg",
-				]),
-			);
+			setTimeout(() => {
+				setImages(
+					new Set([
+						...images,
+						"https://images.pexels.com/photos/35204301/pexels-photo-35204301.jpeg",
+						"https://images.pexels.com/photos/9493870/pexels-photo-9493870.jpeg",
+						"https://images.pexels.com/photos/3776939/pexels-photo-3776939.jpeg",
+					]),
+				);
+			}, 1000);
+
 			console.log("Request to load next");
 		},
 		LightboxComponent: AppLightbox,

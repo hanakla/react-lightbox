@@ -1,6 +1,6 @@
 {
 	"name": "@hanakla/react-lightbox",
-	"version": "1.0.4",
+	"version": "1.0.5",
 	"license": "MIT",
 	"packageManager": "yarn@4.9.3",
 	"main": "./dist/index.js",

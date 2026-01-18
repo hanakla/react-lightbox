@@ -15,6 +15,7 @@ import {
 	useEffect,
 	useLayoutEffect,
 	useMemo,
+	useReducer,
 	useRef,
 	useState,
 } from "react";
@@ -611,7 +612,7 @@ export function useLightbox<T>({
 	preventScrollWhileOpen = true,
 	LightboxComponent,
 }: {
-	onLoadNext: () => void;
+	onLoadNext?: () => void;
 	onVisibilityChange?: (visible: boolean) => void;
 	preventScrollWhileOpen?: boolean;
 	LightboxComponent: React.ComponentType<LightboxProps<T>>;
@@ -623,17 +624,17 @@ export function useLightbox<T>({
 		new Set(),
 	);
 
-	const onLoadNextRef = useEventCallback(onLoadNext);
-	const onVisibilityChangeRef = useEventCallback(
-		onVisibilityChange ?? (() => {}),
-	);
+	const onLoadNextRef = useEventCallback(onLoadNext ?? noop);
+	const onVisibilityChangeRef = useEventCallback(onVisibilityChange ?? noop);
 
 	const LightboxView = useMemo(
 		() =>
 			function LightboxView() {
 				// biome-ignore-start lint/correctness/useHookAtTopLevel: internal
 				const rootRef = useRef<HTMLDivElement>(null);
+				const prevItemsRef = useRef<T[]>([]);
 				const [isOpen, setOpen] = useState<number | null>(null);
+				const [collectedItems, setCollectedItems] = useState<T[]>([]);
 
 				useEffect(() => {
 					setOpens.current.add(setOpen);
@@ -669,18 +670,39 @@ export function useLightbox<T>({
 					() =>
 						({
 							rootRef,
-							items: items.current,
+							items: collectedItems,
 							currentIndex: isOpen,
 							setCurrentIndex: setIndex,
 							close: handleClose,
 							preventScrollWhileOpen,
 							onLoadNext: onLoadNextRef,
 						}) satisfies LightboxContext<T>,
-					[isOpen, setIndex, handleClose, preventScrollWhileOpen],
+					[
+						collectedItems,
+						isOpen,
+						setIndex,
+						handleClose,
+						preventScrollWhileOpen,
+					],
 				);
 
-				// biome-ignore-end lint/correctness/useHookAtTopLevel: internal
+				// biome-ignore lint/correctness/useExhaustiveDependencies: watch only
+				useEffect(() => {
+					const currentItems = items.current;
 
+					if (
+						prevItemsRef.current.length !== currentItems.length ||
+						prevItemsRef.current.some(
+							(item, index) => item !== currentItems[index],
+						)
+					) {
+						setCollectedItems([...currentItems]);
+					}
+
+					prevItemsRef.current = currentItems;
+				}, [items.current]);
+
+				// biome-ignore-end lint/correctness/useHookAtTopLevel: internal
 				if (isOpen == null || typeof window === "undefined") {
 					return null;
 				}
@@ -690,7 +712,7 @@ export function useLightbox<T>({
 						<Portal>
 							<LightboxContext.Provider value={context}>
 								<LightboxComponent
-									items={items.current}
+									items={collectedItems}
 									onLoadNext={onLoadNextRef}
 									onClose={handleClose}
 									defaultIndex={isOpen}
@@ -849,3 +871,5 @@ export function useEventCallback<T extends (...args: any[]) => any>(fn: T) {
 	return stableRef.current;
 }
 // biome-ignore-end lint/correctness/useHookAtTopLevel: Why???
+
+function noop() {}
